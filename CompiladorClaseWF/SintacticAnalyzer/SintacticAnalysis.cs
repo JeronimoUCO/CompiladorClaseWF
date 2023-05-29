@@ -87,18 +87,18 @@ namespace CompiladorClaseWF.SintacticAnalyzer
             {
                 LeerSiguienteComponente();
                 Termino();
-
                 if (!ErrorManagement.HayErrores())
                 {
                     double derecho = StackData.Pop();
                     double izquierdo = StackData.Pop();
                     StackData.Push(izquierdo * derecho);
+                    
                 }
             }
             else if (EsCategoriaEsperada(Category.DIVISION))
             {
                 LeerSiguienteComponente();
-                Termino();
+                Factor();
 
                 if (!ErrorManagement.HayErrores())
                 {
@@ -110,13 +110,13 @@ namespace CompiladorClaseWF.SintacticAnalyzer
                         string fail = "División por cero...";
                         string cause = "Componente léxico igual a cero...";
                         string solution = "Asegúrese de que en este lugar esté ubicado un número diferente de cero...";
-                        CreateSintacticError(ErrorType.CONTROLABLE, fail, cause, solution, Category.DECIMAL,
+                        CreateSemanticError(ErrorType.CONTROLABLE, fail, cause, solution, Category.DECIMAL,
                             "Cero (0)");
 
                         derecho = 1;
                     }
-
                     StackData.Push(izquierdo / derecho);
+                    TerminoPrima();
                 }
             }
         }
