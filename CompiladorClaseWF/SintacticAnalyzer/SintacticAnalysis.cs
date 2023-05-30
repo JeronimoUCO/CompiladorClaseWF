@@ -3,9 +3,11 @@ using CompiladorClaseWF.ErrorManager;
 using CompiladorClaseWF.LexicalAnalyzer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 
 namespace CompiladorClaseWF.SintacticAnalyzer
 {
@@ -13,11 +15,13 @@ namespace CompiladorClaseWF.SintacticAnalyzer
     {
         private LexicalComponent Component;
         private Stack<double> StackData = new Stack<double>();
-
+        private Stack<double> StackDataDemo;
         public string Analyze()
         {
             string response = "El proceso de análisis sintáctico finalizó exitosamente...";
             LexicalAnalysis.Initialize();
+            StackDataDemo = StackData;
+            
             LeerSiguienteComponente();
             Expresion();
 
@@ -49,29 +53,31 @@ namespace CompiladorClaseWF.SintacticAnalyzer
 
         private void ExpresionPrima()
         {
-            if (EsCategoriaEsperada(Category.SUMA))
+            while (EsCategoriaEsperada(Category.SUMA) || EsCategoriaEsperada(Category.RESTA))
             {
+                Category operador = Component.GetCategory();
                 LeerSiguienteComponente();
-                Expresion();
+                Termino();
 
                 if (!ErrorManagement.HayErrores())
                 {
                     double derecho = StackData.Pop();
                     double izquierdo = StackData.Pop();
-                    StackData.Push(izquierdo + derecho);
-                }
-            }
-            else if (EsCategoriaEsperada(Category.RESTA))
-            {
-                LeerSiguienteComponente();
-                Expresion();
 
-                if (!ErrorManagement.HayErrores())
-                {
-                    double derecho = StackData.Pop();
-                    double izquierdo = StackData.Pop();
-                    StackData.Push(izquierdo - derecho);
+                    if (operador.Equals(Category.SUMA))
+                    {
+                        StackData.Push(izquierdo + derecho);
+                    }
+                    else if (operador.Equals(Category.RESTA))
+                    {
+                        StackData.Push(izquierdo - derecho);
+                    }
                 }
+                foreach (double i in StackDataDemo)
+                {
+                    Debug.WriteLine(i);
+                }
+                Debug.WriteLine("----------------------------------------");
             }
         }
 
@@ -92,7 +98,7 @@ namespace CompiladorClaseWF.SintacticAnalyzer
                     double derecho = StackData.Pop();
                     double izquierdo = StackData.Pop();
                     StackData.Push(izquierdo * derecho);
-                    
+
                 }
             }
             else if (EsCategoriaEsperada(Category.DIVISION))
@@ -118,7 +124,13 @@ namespace CompiladorClaseWF.SintacticAnalyzer
                     StackData.Push(izquierdo / derecho);
                     TerminoPrima();
                 }
+                
             }
+            foreach (double i in StackDataDemo)
+            {
+                Debug.WriteLine(i);
+            }
+            Debug.WriteLine("----------------------------------------");
         }
 
         private void Factor()
@@ -172,7 +184,7 @@ namespace CompiladorClaseWF.SintacticAnalyzer
 
         private void LeerSiguienteComponente()
         {
-            Component = LexicalAnalysis.Analyze();
+            Component = LexicalAnalysis.Analyze();   
         }
 
         private void CreateSintacticError(ErrorType errorType, string fail, string cause, string solution, Category expectedCategory, string lexeme)

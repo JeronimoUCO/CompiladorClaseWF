@@ -3,6 +3,7 @@ using CompiladorClaseWF.DataCache;
 using CompiladorClaseWF.ErrorManager;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace CompiladorClaseWF.LexicalAnalyzer
         private LexicalComponent Component;
 
 
-        public static LexicalAnalysis GetInstance() { return INSTANCE; }
+        //public static LexicalAnalysis GetInstance() { return INSTANCE; }
         public static void Initialize()
         {
             Scanner.Initialize();
@@ -57,7 +58,6 @@ namespace CompiladorClaseWF.LexicalAnalyzer
         public static LexicalComponent Analyze()
         {
             Restart();
-
             while (INSTANCE.Continue)
             {
                 if (INSTANCE.CurrentState == 0)
@@ -380,11 +380,11 @@ namespace CompiladorClaseWF.LexicalAnalyzer
 
         private static void ProcessState10()
         {
-            CreateComponentReturningIndex(Category.PARENTESIS_QUE_ABRE, ComponentType.NORMAL);
+            CreateComponentWithoutReturnIndex(Category.PARENTESIS_QUE_ABRE, ComponentType.NORMAL);
         }
         private static void ProcessState11()
         {
-            CreateComponentReturningIndex(Category.PARENTESIS_QUE_CIERRA, ComponentType.NORMAL);
+            CreateComponentWithoutReturnIndex(Category.PARENTESIS_QUE_CIERRA, ComponentType.NORMAL);
         }
         private static void ProcessState12()
         {
